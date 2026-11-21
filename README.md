@@ -111,6 +111,9 @@ for rebuilding the benchmark from the original sources, whose own terms apply.
 - **This repository**: the acquisition, preparation and assembly code and the
   project documentation are released under the MIT License (see `LICENSE`).
   The MIT License does not cover the NEON or Ventura imagery and annotations.
+  `LICENSE` deliberately omits the template's copyright line because the
+  copyright holder has not been formally established; this is a departure from
+  the standard MIT template, not a statement about ownership.
 - **NeonTreeEvaluation** (https://github.com/weecology/NeonTreeEvaluation):
   the pipeline downloads the pinned Zenodo release v0.2.2,
   https://zenodo.org/records/5914554, whose record lists **CC BY 4.0**. The
