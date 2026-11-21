@@ -1,220 +1,77 @@
 # Dataset Registry
 
-> **Status: INITIALIZED, NOT VERIFIED.** No dataset characteristic in this
-> registry has been checked against a primary source yet. Every field is
-> marked **Requires verification** until it is confirmed and cited.
+Verified status of candidate datasets for tree-detection benchmarking.
+Selection rules and limitations for benchmark_v1 are recorded in
+`decision_log.md` (D-002). Unresolved items are labelled as such.
 
 _Last updated: 2026-11-21_
 
-## How to use this registry
+## Summary
 
-- Fill in a field only after confirming it from a primary source (original
-  paper, official repository, data portal, or license file).
-- Record the source for each verified field in the entry's **Sources** list,
-  with the access date.
-- Mark conflicting information as **Conflicting**, list both sources, and
-  explain the discrepancy in the notes.
-- **Preliminary leads** are unverified pointers to help with the lookup. They
-  are **not** registry data and must not be cited.
-
-## Field definitions
-
-| Field | Definition |
-|---|---|
-| Dataset name | Official name and common abbreviation |
-| Source URL | Official landing page, repository, or data portal |
-| Publication / version | Citing publication(s) and dataset version or release date |
-| Geography | Countries, regions, sites, or cities covered |
-| Urban relevance | Share or type of urban imagery: none / partial / primary |
-| Image count | Number of images or tiles, by split if available |
-| Resolution | Ground sampling distance (cm/pixel) and sensor/platform |
-| Annotation format | Geometry (bounding box, polygon, point, mask) and file format |
-| Ground-truth methodology | How labels were made (field survey, manual image annotation, LiDAR-derived, etc.) and QA process |
-| Training/test separation | Official splits and whether the test data is independent |
-| Licensing | Data license and any usage restrictions |
-| Model-training overlap | Known use in training the models we plan to evaluate |
-| Research suitability | Assessment against `selection_criteria.md` (fill in after verification) |
-| Verification status | Not started / In progress / Verified (date) |
-
-## Summary table
-
-| # | Dataset | Type | Urban relevance | Verification status |
-|---|---|---|---|---|
-| 1 | NEON Tree Evaluation | Source dataset | Requires verification | Not started |
-| 2 | OAM-TCD | Source dataset | Requires verification | Not started |
-| 3 | Urban Tree Detection (Ventura et al.) | Source dataset | Requires verification | Not started |
-| 4 | DeepTrees-Halle | Source dataset | Requires verification | Not started |
-| 5 | MillionTrees | **Aggregation / benchmark framework** | Requires verification | Not started |
+| Dataset | Status | Reference type | Role |
+|---|---|---|---|
+| NEON Tree Evaluation | Verified, selected, prepared | Crown bounding boxes (image-annotated) | benchmark_v1: 193 images |
+| Ventura Urban Tree Detection | Verified, selected, prepared | Tree points (image-annotated) | benchmark_v1: 307 images |
+| Schütte et al. (2025), Berlin/Osnabrück | Evaluated, not selected for v1 | Crown polygons | Possible future dataset |
+| Campo Grande, Zamboni et al. (2021) | Evaluated, not selected for v1 | Bounding boxes | Deprioritized |
+| OAM-TCD, DeepTrees-Halle, MillionTrees | Desk review only | Mixed | Not selected (see bottom) |
 
 ---
 
-## 1. NEON Tree Evaluation
+## 1. NEON Tree Evaluation — verified, selected, prepared
 
 | Field | Value |
 |---|---|
-| Dataset name | NEON Tree Evaluation |
-| Source URL | Requires verification |
-| Publication / version | Requires verification |
-| Geography | Requires verification |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification |
-| Annotation format | Requires verification |
-| Ground-truth methodology | Requires verification |
-| Training/test separation | Requires verification |
-| Licensing | Requires verification |
-| Model-training overlap | Requires verification. **High priority**: check its relationship to DeepForest's pretrained model and training data. |
-| Research suitability | Pending verification |
-| Verification status | Not started |
+| Source | Zenodo release v0.2.2, https://doi.org/10.5281/zenodo.5914554 (record lists CC BY 4.0); GitHub https://github.com/weecology/NeonTreeEvaluation (CC0 1.0 licence file) |
+| Publication | Weinstein, B. G. et al. (2021), *PLOS Computational Biology* 17(7): e1009180 |
+| Geography | NEON field sites across the USA; forests and woodlands (not urban) |
+| Eligible pool | 194 RGB images with image-annotated XML (226 XMLs, 2,289 RGB TIFFs in the archives) |
+| Selected (benchmark_v1) | **193 images, 6,629 crown boxes, 22 sites** (2017: 3, 2018: 148, 2019: 42) |
+| Imagery | 3-band 8-bit RGB GeoTIFF, mostly 400 × 400 px, approximately 0.10 m GSD |
+| Ground truth | Visual image annotation intended to cover every visible tree in each plot (paper); a second annotator relabelled 71 plots. Not an independently field-verified census |
+| Exclusion | `SJER_016_2018`: lies inside hand-annotated training tile `2018_SJER_3_258000_4106000_image` |
+| Unresolved | `2018_SJER_3_252000_4113000_image_323` may overlap training crop `..._image_310`; LiDAR pseudo-label coverage of evaluation plots in DeepForest's training is undocumented |
+| Limitations | Images are clustered within sites (SJER and TEAK dominate); visual QA found apparent omissions of small or shadowed trees (e.g. `2018_TEAK_3_318000_4103000_image_261`, `JERC_056_2018`); source orthorectification distortion in some crowns. Published totals differ from the files (e.g. 207 images / 6,926 trees in Weinstein et al. 2021, *eLife*; 6,490 trees in the dataset paper); counts here come from the files |
 
-**Preliminary leads (unverified):** Associated with the Weecology lab and the
-DeepForest authors (Weinstein et al.). Reportedly derived from National
-Ecological Observatory Network (NEON) airborne data at US sites.
-
-**Sources:** _None recorded yet._
-
----
-
-## 2. OAM-TCD
+## 2. Ventura Urban Tree Detection — verified, selected, prepared
 
 | Field | Value |
 |---|---|
-| Dataset name | OAM-TCD |
-| Source URL | Requires verification |
-| Publication / version | Requires verification |
-| Geography | Requires verification |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification |
-| Annotation format | Requires verification |
-| Ground-truth methodology | Requires verification |
-| Training/test separation | Requires verification |
-| Licensing | Requires verification. Check whether imagery and annotations have different licenses. |
-| Model-training overlap | Requires verification |
-| Research suitability | Pending verification |
-| Verification status | Not started |
+| Source | https://github.com/jonathanventura/urban-tree-detection-data @ `78e81bdbb484048472e77cbedd3afb49a6b621c6` (CC BY 4.0 per README) |
+| Publication | Ventura, J. et al. (2024), *Int. J. Applied Earth Observation and Geoinformation* 130: 103848 |
+| Geography | Eight California cities: Bishop, Chico, Claremont, Eureka, Long Beach, Palm Springs, Riverside, Santa Monica |
+| Available | 1,651 images (NAIP 2016/2018/2020) of **604 distinct locations**; **96,547** point annotations in the files (README states 95,972; paper 96,425) |
+| Selected (benchmark_v1) | **307 images from 2020**, one per location (Bishop 10, Eureka 21, 46 per other city; seed 20261121) |
+| Selected references | **18,308 point records, 18,289 unique coordinates** (19 exact duplicates in 10 images, preserved unchanged) |
+| Imagery | 256 × 256 px NAIP, 4 bands (R, G, B, NIR); bands 1–3 used; approximately 0.60 m GSD |
+| Ground truth | Manual image annotation seeded from municipal inventories and extended to all visible trees, including private property (paper §2.2). Not field-verified coordinates |
+| Selection safeguards | Overlapping footprints (>1 pixel) replaced deterministically: `palm_springs_2020_41` → `_1`, `_65` → `_2`. Shared borders allowed |
+| Limitations | Official splits reuse locations across years (not used); same-city tiles are spatially clustered; 60 cm imagery is coarse for crown detectors trained at about 10 cm; two selected images contain no trees in the source |
 
-**Preliminary leads (unverified):** Reportedly a tree cover delineation
-dataset built on OpenAerialMap imagery and released by Restor (Veitch-Michaelis
-et al.). Check whether annotations include individual trees, canopy groups,
-or both, since this affects counting.
-
-**Sources:** _None recorded yet._
-
----
-
-## 3. Urban Tree Detection (Ventura et al.)
+## 3. Schütte et al. (2025), Berlin/Osnabrück — evaluated, not selected for v1
 
 | Field | Value |
 |---|---|
-| Dataset name | Urban Tree Detection (Ventura et al.). Confirm official name |
-| Source URL | Requires verification |
-| Publication / version | Requires verification |
-| Geography | Requires verification |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification |
-| Annotation format | Requires verification |
-| Ground-truth methodology | Requires verification |
-| Training/test separation | Requires verification |
-| Licensing | Requires verification |
-| Model-training overlap | Requires verification |
-| Research suitability | Pending verification |
-| Verification status | Not started |
+| Source | Zenodo v2, https://doi.org/10.5281/zenodo.17721877 (CC BY 4.0); publication doi:10.1109/JSTARS.2025.3626942 |
+| Content | 30 study areas (Berlin 24, Osnabrück 6), Germany; 14,677 crown polygons with per-crown urban environment classes (7 in Berlin, 5 in Osnabrück) |
+| Imagery | 20 cm orthophotos (Berlin 2020, Osnabrück 2023), false-colour and RGB renderings |
+| Open questions | Annotation completeness (all visible trees vs. inventory-guided trees) unresolved; Berlin RGB provenance uncertain (red/green differ from the false-colour rendering; blue lacks a typical vegetation signature); mixed 8/16-bit RGB files |
+| Preprocessing notes | Osnabrück crowns (EPSG:25833) must be reprojected to the rasters (EPSG:25832); class IDs differ between cities |
+| Assessment | Possible future urban dataset for recall and per-environment analysis once completeness and RGB provenance are confirmed with the authors |
 
-**Preliminary leads (unverified):** Reportedly focused on urban trees in
-California. Annotation geometry may be point-based rather than boxes. Check
-this, since it affects compatibility with box-based detectors.
-
-**Sources:** _None recorded yet._
-
----
-
-## 4. DeepTrees-Halle
+## 4. Campo Grande, Zamboni et al. (2021) — evaluated, not selected for v1
 
 | Field | Value |
 |---|---|
-| Dataset name | DeepTrees-Halle. Confirm official name |
-| Source URL | Requires verification |
-| Publication / version | Requires verification |
-| Geography | Requires verification |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification |
-| Annotation format | Requires verification |
-| Ground-truth methodology | Requires verification |
-| Training/test separation | Requires verification |
-| Licensing | Requires verification |
-| Model-training overlap | Requires verification |
-| Research suitability | Pending verification |
-| Verification status | Not started |
+| Source | https://github.com/pedrozamboni/individual_urban_tree_crown_detection (no licence file); publication doi:10.3390/rs13132482 |
+| Content | 220 RGB patches (512 × 512 px, 10 cm) from two 2013 orthoimages of one city; 3,382 bounding boxes |
+| Findings | About 575 boxes are halves of crowns split across patch borders, so at most about 2,807 distinct trees; patches are not georeferenced (grid layout reconstructable); 29 zero-area slivers; repeated random folds |
+| Reasons deprioritized | Unclear redistribution and licensing terms; very limited geographic independence (one city, one date, about 0.58 km²); crown fragmentation complicates counting |
 
-**Preliminary leads (unverified):** The name suggests coverage of Halle
-(Saale), Germany. Confirm the publishing group, data access, and whether it is
-a standalone dataset or part of a larger toolkit.
+## Other candidates (desk review only)
 
-**Sources:** _None recorded yet._
-
----
-
-## 5. MillionTrees (aggregation / benchmark framework)
-
-> **Not an independent source dataset.** MillionTrees is treated as an
-> aggregation or benchmark framework that combines existing datasets. Its
-> component datasets must be identified and assessed individually. Ground
-> truth, licensing, and training overlap come from each component source, not
-> from MillionTrees itself.
-
-| Field | Value |
+| Dataset | Finding |
 |---|---|
-| Dataset name | MillionTrees |
-| Source URL | Requires verification |
-| Publication / version | Requires verification. Record the exact release used, because component sets may change between versions |
-| Component datasets | Requires verification. List each source dataset and check for overlap with entries 1–4 |
-| Geography | Requires verification (aggregate of components) |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification (likely varies by component) |
-| Annotation format | Requires verification (check how box/point/polygon tasks are organized) |
-| Ground-truth methodology | Inherited from component datasets. Requires verification per component |
-| Training/test separation | Requires verification. Check the framework's split definitions against the original dataset splits |
-| Licensing | Requires verification per component. Framework license may differ from component licenses |
-| Model-training overlap | Requires verification. **High priority**: check whether evaluated models were trained on any components |
-| Research suitability | Pending verification |
-| Verification status | Not started |
-
-**Preliminary leads (unverified):** Reportedly developed by the Weecology lab
-(same group as DeepForest). This makes the training-overlap check especially
-important.
-
-**Sources:** _None recorded yet._
-
----
-
-## Entry template (for new candidates)
-
-```markdown
-## N. <Dataset name>
-
-| Field | Value |
-|---|---|
-| Dataset name | |
-| Source URL | Requires verification |
-| Publication / version | Requires verification |
-| Geography | Requires verification |
-| Urban relevance | Requires verification |
-| Image count | Requires verification |
-| Resolution | Requires verification |
-| Annotation format | Requires verification |
-| Ground-truth methodology | Requires verification |
-| Training/test separation | Requires verification |
-| Licensing | Requires verification |
-| Model-training overlap | Requires verification |
-| Research suitability | Pending verification |
-| Verification status | Not started |
-
-**Preliminary leads (unverified):**
-
-**Sources:**
-- <field(s)>: <citation or URL>, accessed YYYY-MM-DD
-```
+| OAM-TCD (Restor, 2024) | Global 10 cm imagery, 5,072 tiles; annotations do not target every tree (closed canopy labelled as groups), so unsuitable for counting |
+| DeepTrees-Halle (2026) | Halle, Germany; 241 tiles at 20 cm with tree/cluster/unsure polygon classes; completeness not documented |
+| MillionTrees | Aggregation framework, not an independent source; modifies its components (tiling, geometry conversion, model-based filtering, re-mapped splits); original sources preferred |
