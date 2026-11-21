@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# benchmark_v1 manifest copy: keep exact bytes so its SHA-256 matches the frozen build
+docs/benchmark_v1_manifest.csv -text
