@@ -77,7 +77,7 @@ All references to pilot findings must cite `tree_boxes` explicitly.
 ### D-002: benchmark_v1 composition and selection rules (193 NEON + 307 Ventura)
 
 - **Date:** 2026-11-21
-- **Status:** Proposed (pending maintainer review and full-download validation)
+- **Status:** Accepted (2026-11-21, after full-download validation; see acceptance record below)
 - **Decided by:** Gabriel Penedo
 - **Related documents:** data/README.md, docs/benchmark_v1_selection.csv, scripts/
 
@@ -146,3 +146,41 @@ source versions and a fixed seed, so the selection is reproducible.
 Run the five scripts after approving the full downloads (~3.85 GB NEON
 archive, ~450 MB Ventura checkout); confirm the real run reproduces
 `docs/benchmark_v1_selection.csv`, then set this entry to Accepted.
+
+**Acceptance record (2026-11-21)**
+- *Build:* the five scripts ran on the original sources with Python 3.12.13,
+  rasterio 1.5.2 (GDAL 3.12.2), Pillow 13.0.0 and numpy 2.5.5 (full pins in
+  `requirements.txt`). `benchmark_v1` contains **500 images: 193 NEON (6,629
+  crown boxes, 22 sites) and 307 Ventura (18,308 point records, 18,289
+  distinct coordinates; 8 cities)**, matching `docs/benchmark_v1_selection.csv`.
+- *Sources verified:* NEON `annotations.zip` (MD5
+  `f577f0948a259d474ee0199fb8d76524`) and `evaluation.zip` (MD5
+  `f0c444fc59cf0115ce8c981a576fab77`, 3,853,532,101 bytes) from Zenodo
+  5914554 v0.2.2 (CC BY 4.0); Ventura checkout at
+  `78e81bdbb484048472e77cbedd3afb49a6b621c6` (CC BY 4.0, per its README).
+- *Frozen outputs:* manifest SHA-256
+  `b5be4a14ccbfb229fb6372265f7f9dacfeac542e863720e31d8f4e722e6cb4d2`;
+  version-controlled copies in `docs/benchmark_v1_manifest.csv` and
+  `docs/benchmark_v1_SHA256SUMS` (manifest plus all 1,000 image and
+  annotation files, relative paths).
+- *Overlap rule applied:* `palm_springs_2020_41` -> `palm_springs_2020_1`,
+  `palm_springs_2020_65` -> `palm_springs_2020_2`; no selected Ventura
+  footprints overlap (verified with rasterio bounds).
+- *Duplicate points:* the 19 exact duplicate point records in 10 selected
+  Ventura images are preserved unchanged; how they are counted is an
+  evaluation-protocol decision, not a dataset change.
+- *Provenance correction:* the first version of the selection file recorded a
+  test-fixture revision (`2b88d423...`) for Ventura rows; corrected in commit
+  `7ef04ea` (307 `source_version` cells only; IDs and order unchanged).
+- *Unresolved training exposure:* `2018_SJER_3_252000_4113000_image_323`
+  (possible overlap with training crop `..._image_310`) and undocumented
+  LiDAR pseudo-label coverage of NEON evaluation plots for
+  `weecology/deepforest-tree` @ `cc21436b...`. Treat NEON results as
+  potentially in-distribution for DeepForest.
+- *Observed NEON completeness limitation:* visual QA (reproducible sample,
+  seed 20261121) found unlabelled small conifers in
+  `2018_TEAK_3_318000_4103000_image_261` and a possibly unboxed shadowed tree
+  in `JERC_056_2018`. NEON references may under-count small or sub-canopy
+  trees; precision and count-error metrics should note this. NEON RGB also
+  shows source orthorectification "swirl" distortion (pixel-identical to the
+  original TIFFs).
