@@ -43,5 +43,5 @@ surfaces), and what failure modes appear?
   hard to separate.
 - Decide which model families are in scope (e.g., specialized detectors such
   as DeepForest, general-purpose vision-language models).
-- Determine how pilot findings from `tree_boxes` (frozen 2026-11-09) inform,
+- Determine how earlier pilot findings (frozen 2026-11-09) inform,
   but do not substitute for, these questions.
