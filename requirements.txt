@@ -1,0 +1,5 @@
+# Dataset pipeline (scripts/), Python 3.12. Git must also be installed (used by fetch_ventura.py).
+# Record exact versions with `pip freeze` when benchmark_v1 is built.
+pillow>=10.0
+numpy>=1.26
+rasterio>=1.3
