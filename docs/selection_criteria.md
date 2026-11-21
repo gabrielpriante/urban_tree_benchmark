@@ -1,79 +1,135 @@
 # Dataset Selection Criteria
 
-> **Status: PROVISIONAL.** These criteria guide dataset screening. Weights and
-> thresholds will be finalized after the initial registry verification and
-> recorded in `decision_log.md`.
+> **Status: applied for benchmark_v1.** The criteria below were used to select
+> the datasets in benchmark_v1. The selection is recorded in `decision_log.md`
+> (D-002); dataset details are in `dataset_registry.md`.
 
 _Last updated: 2026-11-21_
 
-Each candidate in `dataset_registry.md` is assessed against the criteria
-below. Ratings: **Meets / Partially meets / Does not meet / Unknown**. A
-dataset rated **Unknown** on any required criterion cannot be selected until
-that criterion is resolved.
+Ratings: **Meets / Partially meets / Does not meet / Unknown**. A dataset rated
+**Unknown** on a required criterion is not selected until that criterion is
+resolved.
 
 ## Required criteria
 
-### C1. Independent ground truth
+### C1. Documented ground truth
 - Labels come from a documented process (field survey, expert image
   annotation, LiDAR-supported delineation, etc.), not from the outputs of a
   model being evaluated.
-- The annotation protocol and quality control are described well enough to
-  judge reliability.
+- The protocol, including whether every visible tree was labelled, is
+  described well enough to judge reliability.
 
 ### C2. Model-training overlap
-- Determine whether any part of the dataset (including the test split) was
-  used to train, fine-tune, or select the models under evaluation.
-- Overlapping datasets may still be used, but must be reported as
-  **in-distribution** and analyzed separately from independent test data.
-- For aggregation frameworks (e.g., MillionTrees), assess overlap for each
-  component.
+- Determine whether any part of the dataset was used to train, fine-tune, or
+  select the models under evaluation.
+- Known overlaps are excluded or reported as **in-distribution**.
+- For aggregation frameworks (e.g., MillionTrees), assess each component.
 
 ### C3. Annotation compatibility
-- Annotation geometry (box, point, polygon, mask) can be compared with model
-  outputs without heavy, lossy conversion.
-- Any conversions (e.g., polygon to box, box to point) are documented and
-  their effect on metrics is considered.
-- The annotation unit (individual crown vs. canopy group) matches the
-  counting task.
+- Annotation geometry can be compared with model outputs without heavy, lossy
+  conversion; any matching rule or conversion is documented.
+- The annotation unit (individual tree vs. canopy group) matches the counting
+  task.
 
 ### C4. Data licensing
-- The license allows research use and publication of derived results.
-- Redistribution limits are noted. If redistribution is not allowed, only
-  access instructions and derived metrics are shared.
+- The licence allows research use and publication of derived results.
+- Where redistribution is limited, only access instructions and derived
+  metadata are shared.
 
 ### C5. Image resolution
-- Ground sampling distance is fine enough to resolve individual crowns in the
-  target setting.
-- Resolution is compatible with the models' expected input, or resampling
-  needs are documented.
+- Ground sampling distance resolves individual crowns, or resampling needs are
+  documented.
 
 ## Desired criteria
 
-### C6. Urban representation
-- The dataset includes urban scenes (street trees, parks, residential areas,
-  mixed impervious surfaces).
-- The amount and type of urban content is documented.
+- **C6. Urban representation**: urban scenes are included and documented.
+- **C7. Geographic diversity**: multiple regions, climates, or cities.
+- **C8. Accessibility and documentation**: stable, versioned public access
+  with sensor, date, and georeferencing metadata.
+- **C9. Scale and independence**: enough images and annotations, and a
+  sample that avoids repeated or overlapping footprints.
 
-### C7. Geographic diversity
-- Coverage of multiple regions, climates, or cities, to support
-  generalization analysis.
-- The geographic distribution relative to model training data is described.
+## Screening results
 
-### C8. Accessibility and documentation
-- Data can be obtained through a stable, public channel with versioning.
-- Metadata (sensor, acquisition date, georeferencing) is available.
+| Dataset | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | Decision |
+|---|---|---|---|---|---|---|---|---|---|---|
+| NEON Tree Evaluation | Meets | Partially meets | Meets | Meets | Meets | Does not meet | Meets | Meets | Partially meets | **Selected** (forest) |
+| Ventura Urban Tree Detection | Meets | Meets¹ | Partially meets | Meets | Partially meets | Meets | Partially meets | Meets | Meets | **Selected** (urban) |
+| Schütte et al. (2025) | Unknown | Not assessed | Meets | Meets | Meets | Meets | Partially meets | Partially meets | Meets | Not selected for v1 |
+| Campo Grande (Zamboni et al. 2021) | Partially meets | Not assessed | Meets | Unknown | Meets | Meets | Does not meet | Partially meets | Does not meet | Not selected for v1 |
+| OAM-TCD | Does not meet (for counting) | Not assessed | Partially meets | Partially meets | Meets | Partially meets | Meets | Meets | Not assessed | Not selected |
+| DeepTrees-Halle | Unknown | Not assessed | Meets | Meets | Meets | Not assessed | Does not meet | Partially meets | Not assessed | Not selected |
+| MillionTrees | Not applicable (framework) | Assess per component | — | — | — | — | — | — | — | Not used; original sources preferred |
 
-### C9. Scale and split integrity
-- There are enough images and annotations for meaningful evaluation.
-- Official train/test splits exist and do not leak data (e.g., no spatially
-  adjacent tiles across splits).
+"Not assessed" means the dataset was set aside before that criterion was
+investigated; it is not a negative finding.
 
-## Screening record template
+¹ No exposure is documented for the pinned DeepForest checkpoint
+(`weecology/deepforest-tree` @ `cc21436b`); models trained on MillionTrees,
+which includes Ventura's training split, may have seen Ventura images.
 
-| Dataset | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | Decision | Decision log ref |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| NEON Tree Evaluation | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Pending | |
-| OAM-TCD | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Pending | |
-| Urban Tree Detection (Ventura et al.) | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Pending | |
-| DeepTrees-Halle | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Pending | |
-| MillionTrees (framework; assess per component) | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Pending | |
+## Why NEON and Ventura were selected
+
+The two datasets complement each other and both provide reference labels that
+aim to cover every visible tree, which counting and precision metrics require.
+NEON supplies high-resolution forest imagery from many sites; Ventura supplies
+urban imagery from several cities. Both are openly licensed, versioned, and
+reproducible from pinned sources. Their reference types (boxes vs. points) and
+resolutions (0.10 m vs. 0.60 m) differ, so they are evaluated separately.
+
+### NEON Tree Evaluation — selected (primary forest benchmark)
+- **Annotation:** crown bounding boxes drawn by visual image interpretation,
+  intended to cover every visible tree in each 40 m plot; a second annotator
+  relabelled 71 plots. Not an independently field-verified census.
+- **Coverage:** 193 images, 6,629 crown boxes, 22 forest sites across the USA;
+  about 0.10 m resolution; NeonTreeEvaluation Zenodo v0.2.2.
+- **Suitability:** broad geographic and forest-type diversity at the
+  resolution DeepForest was developed for.
+- **Limitations:** one image with known training overlap (`SJER_016_2018`) is
+  excluded; further potential training exposure of DeepForest is unresolved;
+  visual QA found apparent omissions of small or shadowed trees; images are
+  clustered within sites.
+
+### Ventura Urban Tree Detection — selected (primary urban benchmark)
+- **Annotation:** tree-centre points annotated manually on the imagery, seeded
+  from municipal inventories and extended to all visible trees including
+  private property. Not field-verified coordinates.
+- **Coverage:** 1,651 original images of 604 unique locations with 96,547
+  point annotations, in eight California cities. benchmark_v1 uses 307 images
+  from 2020, one per location, with 18,308 point records (including 19 exact
+  duplicate records, preserved unchanged); about 0.60 m resolution.
+- **Suitability:** the only verified, openly licensed source with
+  comprehensive-intent annotations across several urban settings.
+- **Limitations:** coarse resolution for crown detectors; points require a
+  documented matching rule for box predictions; same-city tiles are spatially
+  clustered. Selected footprints do not overlap (two deterministic
+  replacements), and the official splits, which reuse locations across years,
+  are not used.
+
+### Schütte et al. (2025), Berlin/Osnabrück — not selected for v1
+- **Annotation:** about 14,677 manually delineated crown polygons with
+  per-crown urban environment classes, guided by municipal tree registers.
+- **Coverage:** 30 large study areas in Berlin and Osnabrück, Germany; 20 cm
+  orthophotos.
+- **Why not selected:** whether every visible tree was delineated is
+  unresolved; Berlin RGB provenance is uncertain; Osnabrück crowns need
+  reprojection and class IDs differ between cities.
+- **Outlook:** a possible future benchmark for recall and per-environment
+  analysis once completeness and RGB provenance are confirmed.
+
+### Campo Grande, Zamboni et al. (2021) — not selected for v1
+- **Annotation:** 3,382 manually drawn bounding boxes on 220 RGB patches.
+- **Coverage:** 10 cm imagery from two orthomosaics of a single city.
+- **Why not selected:** about 575 boxes are fragments of crowns split across
+  patch borders; very limited geographic independence; no licence file and
+  unclear redistribution terms.
+
+### Other screened datasets
+- **OAM-TCD:** global 10 cm imagery, but annotations do not target every tree
+  (closed canopy is labelled as groups), so it does not support counting;
+  images carry mixed CC BY, CC BY-NC and CC BY-SA licences.
+- **DeepTrees-Halle:** a single German city at 20 cm; annotation completeness
+  is not documented.
+- **MillionTrees:** an aggregation framework that modifies its components
+  (tiling, geometry conversion, model-based filtering, re-mapped splits);
+  original sources are preferred.
