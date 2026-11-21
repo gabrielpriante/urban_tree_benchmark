@@ -75,7 +75,7 @@ complete.
 
 ## 5. Relationship to pilot experiments
 
-Pilot experiments in `tree_boxes` (frozen 2026-11-09) inform which questions
+Earlier pilot experiments (frozen 2026-11-09; not part of this repository) inform which questions
 and failure modes to study. Pilot outputs are not reused as benchmark
 results. Any methodological lesson taken from the pilot is cited in
 `decision_log.md`.
