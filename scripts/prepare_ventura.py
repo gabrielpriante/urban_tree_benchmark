@@ -2,6 +2,8 @@
 
 Sampling: all Bishop (10) and Eureka (21) locations, plus 46 per remaining city drawn with
 random.Random(20261121) from index-sorted candidates, cities processed in alphabetical order.
+Drawn tiles whose footprints overlap (more than one pixel; shared borders allowed) are replaced
+deterministically, see select(); replacements are recorded in the manifest 'notes' column.
 Point annotations are copied unchanged. The source README states that a missing CSV means
 the image has no trees; such images receive a header-only CSV marked 'absent_in_source'.
 """
@@ -50,12 +52,38 @@ def candidates_2020():
     return {city: sorted(v) for city, v in sorted(by_city.items())}  # 604 locations, one image each
 
 
+def footprint(city, index):
+    with rasterio.open(RAW / "images" / f"{city}_{YEAR}_{index}.tif") as src:
+        return src.crs.to_epsg(), tuple(src.bounds)
+
+
+def overlaps(a, b):
+    """True if footprints share more than one pixel in both axes (shared borders are allowed)."""
+    (epsg_a, (l1, b1, r1, t1)), (epsg_b, (l2, b2, r2, t2)) = a, b
+    return epsg_a == epsg_b and min(r1, r2) - max(l1, l2) > GSD_M and min(t1, t2) - max(b1, b2) > GSD_M
+
+
 def select(by_city):
+    """Seeded draw per city; a drawn tile overlapping an already-kept tile (ascending index) is replaced by
+    the lowest-index unselected tile of the same city that overlaps none of the kept tiles."""
     rng = random.Random(SEED)
-    chosen = [(c, i) for c, idx in by_city.items() for i in (idx if c in TAKE_ALL else sorted(rng.sample(idx, PER_CITY)))]
+    chosen, notes = [], {}
+    for city, idx in by_city.items():
+        fp = {i: footprint(city, i) for i in idx}
+        drawn = idx if city in TAKE_ALL else sorted(rng.sample(idx, PER_CITY))
+        kept, dropped = [], []
+        for i in drawn:
+            (dropped if any(overlaps(fp[i], fp[k]) for k in kept) else kept).append(i)
+        if dropped and city in TAKE_ALL:
+            raise SystemExit(f"{city}: overlapping footprints {dropped} cannot be replaced (all locations are used).")
+        for i in dropped:
+            j = next(j for j in idx if j not in drawn and j not in kept and not any(overlaps(fp[j], fp[k]) for k in kept))
+            kept.append(j)
+            notes[(city, j)] = f"replaces {city}_{YEAR}_{i} (footprint overlap)"
+        chosen += [(city, i) for i in sorted(kept)]
     if len(chosen) != TOTAL or len(set(chosen)) != TOTAL:
         raise SystemExit(f"Selection produced {len(chosen)} images ({len(set(chosen))} unique locations).")
-    return chosen
+    return chosen, notes
 
 
 def to_png(tif, png):
@@ -99,7 +127,8 @@ def main():
     (OUT / "images").mkdir(parents=True, exist_ok=True)
     (OUT / "annotations").mkdir(exist_ok=True)
     rows = []
-    for city, index in select(candidates_2020()):
+    chosen, notes = select(candidates_2020())
+    for city, index in chosen:
         source_id = f"{city}_{YEAR}_{index}"
         png, ref = OUT / "images" / f"{source_id}.png", OUT / "annotations" / f"{source_id}.csv"
         width, height = to_png(RAW / "images" / f"{source_id}.tif", png)
@@ -109,7 +138,7 @@ def main():
                      "image_path": png.relative_to(ROOT).as_posix(), "reference_path": ref.relative_to(ROOT).as_posix(),
                      "reference_type": "point", "reference_count": count, "gsd_m": GSD_M, "width": width,
                      "height": height, "source_version": f"urban-tree-detection-data@{REVISION}",
-                     "annotation_origin": origin, "notes": ""})
+                     "annotation_origin": origin, "notes": notes.get((city, index), "")})
     with open(OUT / "manifest.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
