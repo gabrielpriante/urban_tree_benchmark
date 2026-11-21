@@ -8,8 +8,8 @@ metric choices, scope changes, and protocol changes.
 - Do not edit or delete past entries. To reverse or change a decision, add a
   new entry and set the earlier entry's status to `Superseded by D-XXX`.
 - Use ISO dates (`YYYY-MM-DD`).
-- Cite evidence (registry entries, papers, pilot results in `tree_boxes` by
-  path/commit) rather than repeating it.
+- Cite evidence (registry entries, papers, pilot results by path/commit)
+  rather than repeating it.
 
 ---
 
@@ -52,8 +52,8 @@ metric choices, scope changes, and protocol changes.
 - **Related documents:** README.md, CLAUDE.md
 
 **Context**
-Pilot experiments with DeepForest and vision-language models were done in
-`tree_boxes`, which was frozen on 2026-11-09. Further work (dataset
+Pilot experiments with DeepForest and vision-language models were done in a
+separate, non-public pilot repository, which was frozen on 2026-11-09. Further work (dataset
 investigation, benchmark evaluation, reproducible documentation) needs a home
 that leaves the pilot record unchanged.
 
@@ -62,7 +62,7 @@ Create `urban_tree_benchmark` as a separate repository. Pilot outputs are not
 copied into it and are cited by reference only.
 
 **Alternatives considered**
-1. Continue work in `tree_boxes`: rejected because it would break the
+1. Continue work in the pilot repository: rejected because it would break the
    research freeze.
 2. Copy pilot outputs into the new repository: rejected because it would
    duplicate data and blur the line between pilot and benchmark results.
@@ -72,7 +72,7 @@ Keeps the frozen pilot record intact and gives the benchmark its own
 documentation and data policy.
 
 **Consequences / follow-up**
-All references to pilot findings must cite `tree_boxes` explicitly.
+All references to pilot findings must cite the pilot repository explicitly.
 
 ### D-002: benchmark_v1 composition and selection rules (193 NEON + 307 Ventura)
 
@@ -128,7 +128,7 @@ source versions and a fixed seed, so the selection is reproducible.
   `2018_SJER_3_252000_4113000_image_323` shares 1 km tile 252000_4113000 with
   training crop `..._image_310`; LiDAR pseudo-label pretraining coverage of
   evaluation plots is undocumented.
-- The DeepForest checkpoint used in `tree_boxes` is `weecology/deepforest-tree`
+- The DeepForest checkpoint used in the pilot experiments is `weecology/deepforest-tree`
   @ `cc21436bc5d572dde8ff5f93c1e71a32f563cace` (model.safetensors SHA-256
   `d37a7af0b5ba2754282a80d41b4c7b66e8c7149234df5bf3f41bdaf57d329fc8`,
   DeepForest 2.1.0). Its model card documents NEON-based training (LiDAR
@@ -184,3 +184,36 @@ archive, ~450 MB Ventura checkout); confirm the real run reproduces
   trees; precision and count-error metrics should note this. NEON RGB also
   shows source orthorectification "swirl" distortion (pixel-identical to the
   original TIFFs).
+
+### D-003: Public release preparation for benchmark-v1.0.0
+
+- **Date:** 2026-11-21
+- **Status:** Accepted
+- **Decided by:** Gabriel Penedo
+- **Related documents:** LICENSE, README.md, docs/dataset_registry.md, D-001, D-002
+
+**Context**
+The repository is being prepared for a public tagged release of the
+dataset-building code and benchmark_v1 metadata.
+
+**Decision**
+1. Release original code and documentation under the MIT License; the source
+   datasets keep their own terms (NeonTreeEvaluation Zenodo v0.2.2: CC BY 4.0;
+   GitHub repository: CC0 1.0; Ventura: CC BY 4.0 per its README).
+2. Stop tracking the internal assistant-instruction file `CLAUDE.md` (kept
+   locally and ignored).
+3. Replace the name of the non-public pilot repository in public documents
+   (including the wording of D-001 and one sentence of D-002) with neutral
+   wording. Decisions, dates, checkpoint provenance and caveats are unchanged.
+4. Update `docs/dataset_registry.md` with the verified findings.
+
+**Alternatives considered**
+1. Rewrite Git history to remove earlier mentions: not done; earlier commits
+   remain visible after publication.
+
+**Justification**
+The public repository should stand alone as a reproducible dataset-engineering
+project without implying any licence over third-party data.
+
+**Consequences / follow-up**
+Confirm the copyright holder in `LICENSE` before release.
