@@ -19,17 +19,6 @@ The repository is meant to support:
 - reproducible evaluation of existing models (not training new ones), and
 - clear records of research decisions and how they were made.
 
-## Relationship to prior work (`tree_boxes`)
-
-Pilot experiments using DeepForest and vision-language models were done in a
-separate repository, `tree_boxes`. That repository is **frozen** as of
-**November 9, 2026**.
-
-- `tree_boxes` is the record of the pilot phase. It stays unchanged.
-- This repository does **not** contain copies of pilot outputs. Where pilot
-  findings shape decisions here, they are cited by reference (repository,
-  freeze date, and file path or commit) in `docs/decision_log.md`.
-
 ## Research objectives (provisional)
 
 1. Identify publicly available aerial-imagery tree datasets suitable for
@@ -63,7 +52,7 @@ questions.
 ```
 urban_tree_benchmark/
 ├── README.md            Project overview (this file)
-├── CLAUDE.md            Rules for automated assistants working in this repo
+├── LICENSE              MIT License (original code and documentation only)
 ├── requirements.txt     Pinned dependencies for the dataset pipeline
 ├── scripts/             Five-script pipeline that rebuilds benchmark_v1
 ├── docs/
@@ -113,20 +102,34 @@ build: PNG encoding can differ between versions even when pixels are identical.
 Selection rules, exclusions and known limitations are documented in
 `docs/decision_log.md` (D-002) and [data/README.md](data/README.md).
 
-### Attribution and licences of the source data
+### Licensing and attribution
 
-- **NeonTreeEvaluation**: Weinstein, B., Marconi, S., & White, E. (2022).
+This repository does **not** redistribute the 500 source images or their
+annotations. It contains scripts and metadata (identifiers, counts, checksums)
+for rebuilding the benchmark from the original sources, whose own terms apply.
+
+- **This repository**: the acquisition, preparation and assembly code and the
+  project documentation are released under the MIT License (see `LICENSE`).
+  The MIT License does not cover the NEON or Ventura imagery and annotations.
+- **NeonTreeEvaluation** (https://github.com/weecology/NeonTreeEvaluation):
+  the pipeline downloads the pinned Zenodo release v0.2.2,
+  https://zenodo.org/records/5914554, whose record lists **CC BY 4.0**. The
+  GitHub repository (commit `96b29d5`) carries a **CC0 1.0** licence file. We
+  treat the Zenodo CC BY 4.0 terms as applying to the files we use and
+  attribute accordingly. Cite: Weinstein, B., Marconi, S., & White, E. (2022).
   *Data for the NeonTreeEvaluation Benchmark* (v0.2.2) [Data set]. Zenodo.
-  https://doi.org/10.5281/zenodo.5914554 (CC BY 4.0). Described in Weinstein,
-  B. G. et al. (2021), *PLOS Computational Biology* 17(7): e1009180. Imagery
-  originates from the National Ecological Observatory Network Airborne
-  Observation Platform.
-- **Ventura urban tree detection**: https://github.com/jonathanventura/urban-tree-detection-data
-  (CC BY 4.0, as stated in its README). Described in Ventura, J. et al. (2024),
-  *International Journal of Applied Earth Observation and Geoinformation* 130:
-  103848. Imagery from the USDA National Agriculture Imagery Program (NAIP).
-
-Users of `benchmark_v1` must cite and follow the licences of both sources.
+  https://doi.org/10.5281/zenodo.5914554; and Weinstein, B. G. et al. (2021),
+  *PLOS Computational Biology* 17(7): e1009180. The imagery originates from
+  the National Ecological Observatory Network Airborne Observation Platform;
+  NEON's current data policies are not assumed to change the terms of this
+  historical release.
+- **Ventura urban tree detection**
+  (https://github.com/jonathanventura/urban-tree-detection-data): imagery and
+  point annotations are the original authors' work; the repository's README
+  states **CC BY 4.0**, which requires attribution. Cite: Ventura, J. et al.
+  (2024), *International Journal of Applied Earth Observation and
+  Geoinformation* 130: 103848. Imagery from the USDA National Agriculture
+  Imagery Program (NAIP).
 
 ## Data policy
 
