@@ -179,3 +179,96 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# ============================================================
+# urban_tree_benchmark: project-specific rules
+# ============================================================
+
+# --- Data directory: track only README.md ---
+data/*
+!data/README.md
+
+# --- Results directory: track only README.md ---
+# (add explicit exceptions for small, reviewed summary tables if needed)
+results/*
+!results/README.md
+
+# --- Raw imagery and raster datasets (anywhere in repo) ---
+*.tif
+*.tiff
+*.geotiff
+*.jp2
+*.ecw
+*.sid
+*.img
+*.vrt
+*.ovr
+*.aux.xml
+*.las
+*.laz
+*.copc.laz
+*.nc
+*.h5
+*.hdf5
+*.zarr/
+*.npy
+*.npz
+
+# --- Large archives ---
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.gz
+*.bz2
+*.xz
+*.7z
+*.rar
+
+# --- Model weights and large generated outputs ---
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.pkl
+*.joblib
+lightning_logs/
+wandb/
+mlruns/
+outputs/
+checkpoints/
+
+# --- Local environments ---
+.conda/
+conda-env/
+*.code-workspace
+
+# --- API credentials and secrets ---
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+service_account*.json
+secrets.*
+*.secret
+.netrc
+
+# --- Temporary and OS files ---
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+tmp/
+scratch/
+
+# --- Local assistant / editor settings ---
+.claude/settings.local.json
+.vscode/
+.idea/
