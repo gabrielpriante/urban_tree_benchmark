@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREPARED = ROOT / "data" / "prepared"
 OUT = ROOT / "data" / "benchmark_v1"
 STAGING = ROOT / "data" / "benchmark_v1.partial"
+SELECTION = ROOT / "docs" / "benchmark_v1_selection.csv"  # version-controlled list of expected source IDs
 EXPECTED = {"neon": (193, "box", ".xml"), "ventura": (307, "point", ".csv")}
 FIELDS = ["image_id", "dataset", "source_id", "location_id", "site", "year", "image_path", "reference_path",
           "reference_type", "reference_count", "gsd_m", "width", "height", "source_version",
@@ -52,6 +53,12 @@ def main():
     ids = [f"{r['dataset']}__{r['source_id']}" for r in rows]
     if len(set(ids)) != 500:
         raise SystemExit(f"Expected 500 unique image identifiers, found {len(set(ids))}.")
+    with open(SELECTION, newline="", encoding="utf-8") as f:
+        expected = {(r["dataset"], r["source_id"], r["source_version"]) for r in csv.DictReader(f)}
+    actual = {(r["dataset"], r["source_id"], r["source_version"]) for r in rows}
+    if actual != expected:
+        raise SystemExit(f"Prepared images differ from {SELECTION.name}: {len(actual - expected)} unexpected, "
+                         f"{len(expected - actual)} missing.")
     (STAGING / "images").mkdir(parents=True)
     (STAGING / "annotations").mkdir()
     final = []
