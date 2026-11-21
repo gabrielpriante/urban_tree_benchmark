@@ -2,10 +2,10 @@
 
 Urban tree detection dataset research and model benchmarking.
 
-> **Status: ongoing research.** This repository is not a finished benchmark.
-> Research questions, dataset choices, and methods are provisional and will
-> change as the investigation goes on. Results should not be cited until a
-> tagged release says they are final.
+> **Status: ongoing research.** The evaluation dataset `benchmark_v1` is frozen
+> (see below and `docs/decision_log.md`, D-002). Research questions, metrics and
+> methods remain provisional. Model results should not be cited until a tagged
+> release says they are final.
 
 ## Purpose
 
@@ -53,7 +53,8 @@ questions.
    outcome in [docs/decision_log.md](docs/decision_log.md).
 3. **Method finalization**: fix metrics, sampling, and evaluation protocol in
    [docs/methodology.md](docs/methodology.md).
-4. **Environment setup**: pin dependencies and model versions (not done yet).
+4. **Environment setup**: dataset pipeline dependencies pinned in
+   `requirements.txt`; model versions to be pinned before evaluation.
 5. **Evaluation**: run the benchmark with documented configurations.
 6. **Reporting**: summarize results for the paper.
 
@@ -63,16 +64,69 @@ questions.
 urban_tree_benchmark/
 ├── README.md            Project overview (this file)
 ├── CLAUDE.md            Rules for automated assistants working in this repo
+├── requirements.txt     Pinned dependencies for the dataset pipeline
+├── scripts/             Five-script pipeline that rebuilds benchmark_v1
 ├── docs/
 │   ├── research_questions.md
 │   ├── dataset_registry.md
 │   ├── selection_criteria.md
 │   ├── methodology.md
-│   └── decision_log.md
+│   ├── decision_log.md
+│   ├── benchmark_v1_selection.csv   Selected source IDs and source versions
+│   ├── benchmark_v1_manifest.csv    Frozen benchmark manifest (exact bytes)
+│   └── benchmark_v1_SHA256SUMS      Checksums of every benchmark file
 ├── data/                Local data (contents not tracked by Git)
 ├── src/                 Evaluation code (none yet)
 └── results/             Experiment outputs (large outputs not tracked)
 ```
+
+## benchmark_v1 (frozen evaluation dataset)
+
+500 aerial RGB images with their original reference annotations:
+
+| Source | Images | Reference | Ground sampling distance |
+|---|---|---|---|
+| NeonTreeEvaluation v0.2.2 (22 NEON sites) | 193 | 6,629 crown bounding boxes (original XML) | ~0.10 m |
+| Ventura urban tree detection, 2020 imagery (8 California cities) | 307 | 18,308 tree-point records (original CSV) | 0.60 m |
+
+Images and annotations are **not** redistributed here. The repository holds the
+code and the records needed to rebuild and verify them from the original sources.
+
+### Rebuild from the original sources
+
+Requires Python 3.12, Git, about 5 GB of disk space and internet access.
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt   # Windows: .venv\Scripts\pip
+python scripts/fetch_neon.py       # Zenodo 10.5281/zenodo.5914554, MD5-verified
+python scripts/prepare_neon.py
+python scripts/fetch_ventura.py    # pinned Git revision 78e81bdbb484048472e77cbedd3afb49a6b621c6
+python scripts/prepare_ventura.py
+python scripts/build_benchmark.py  # offline; refuses output that differs from the selection file
+sha256sum -c docs/benchmark_v1_SHA256SUMS
+```
+
+Run the Python commands with the environment's interpreter. Annotation checksums
+do not depend on library versions. Image checksums assume the pinned Pillow
+build: PNG encoding can differ between versions even when pixels are identical.
+Selection rules, exclusions and known limitations are documented in
+`docs/decision_log.md` (D-002) and [data/README.md](data/README.md).
+
+### Attribution and licences of the source data
+
+- **NeonTreeEvaluation**: Weinstein, B., Marconi, S., & White, E. (2022).
+  *Data for the NeonTreeEvaluation Benchmark* (v0.2.2) [Data set]. Zenodo.
+  https://doi.org/10.5281/zenodo.5914554 (CC BY 4.0). Described in Weinstein,
+  B. G. et al. (2021), *PLOS Computational Biology* 17(7): e1009180. Imagery
+  originates from the National Ecological Observatory Network Airborne
+  Observation Platform.
+- **Ventura urban tree detection**: https://github.com/jonathanventura/urban-tree-detection-data
+  (CC BY 4.0, as stated in its README). Described in Ventura, J. et al. (2024),
+  *International Journal of Applied Earth Observation and Geoinformation* 130:
+  103848. Imagery from the USDA National Agriculture Imagery Program (NAIP).
+
+Users of `benchmark_v1` must cite and follow the licences of both sources.
 
 ## Data policy
 
